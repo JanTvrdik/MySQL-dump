@@ -23,6 +23,9 @@ class MySQLDump
 	/** @var bool lock all tables before dumping */
 	private $useLock = FALSE;
 
+	/** @var array (tableName => SQL) customized data selection queries */
+	private $customDataSelect;
+
 
 
 	/**
@@ -79,6 +82,19 @@ class MySQLDump
 	public function setUseLock($useLock)
 	{
 		$this->useLock = $useLock;
+		return $this;
+	}
+
+
+
+	/**
+	 * @param  string
+	 * @param  string
+	 * @return self
+	 */
+	public function setCustomDataSelect($table, $sql)
+	{
+		$this->customDataSelect[$table] = $sql;
 		return $this;
 	}
 
@@ -188,7 +204,8 @@ class MySQLDump
 
 
 			$size = 0;
-			$res = $this->connection->query("SELECT * FROM `$table`", MYSQLI_USE_RESULT);
+			$query = (isset($this->customDataSelect[$table]) ? $this->customDataSelect[$table] : "SELECT * FROM `$table`");
+			$res = $this->connection->query($query, MYSQLI_USE_RESULT);
 			while ($row = $res->fetch_assoc()) {
 				$s = '(';
 				foreach ($row as $key => $value) {
