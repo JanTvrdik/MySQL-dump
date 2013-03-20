@@ -28,7 +28,7 @@ class MySQLDump
 	/**
 	 * Connects to database.
 	 * @param  mysqli connection
-	*/
+	 */
 	public function __construct(mysqli $connection)
 	{
 		$this->connection = $connection;
@@ -88,10 +88,10 @@ class MySQLDump
 	 * Sends dump to browser.
 	 * @param  string filename
 	 * @return void
-	*/
+	 */
 	public function send($file)
 	{
-		ini_set('zlib.output_compression', true);
+		ini_set('zlib.output_compression', TRUE);
 		header('Content-Type: ' . (strcasecmp(substr($file, -3), '.gz') ? 'text/plain' : 'application/x-gzip'));
 		header('Content-Disposition: attachment; filename="' . $file . '"');
 		header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -106,7 +106,7 @@ class MySQLDump
 	 * Saves dump to the file.
 	 * @param  string filename
 	 * @return void
-	*/
+	 */
 	public function save($file)
 	{
 		$handle = strcasecmp(substr($file, -3), '.gz') ? fopen($file, 'wb') : gzopen($file, 'wb');
@@ -122,7 +122,7 @@ class MySQLDump
 	 * Writes dump to logical file.
 	 * @param  resource
 	 * @return void
-	*/
+	 */
 	public function write($handle)
 	{
 		if (!is_resource($handle) || get_resource_type($handle) !== 'stream') {
