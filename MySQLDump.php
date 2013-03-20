@@ -4,10 +4,11 @@
  * MySQL database dump.
  *
  * @author     David Grudl
+ * @author     Jan Tvrdík
  * @copyright  Copyright (c) 2008 David Grudl
  * @license    New BSD License
  * @link       http://phpfashion.com/
- * @version    1.0
+ * @version    1.1-dev
  */
 class MySQLDump
 {
@@ -15,6 +16,9 @@ class MySQLDump
 
 	/** @var mysqli */
 	private $connection;
+
+	/** @var string[] list of tables which will not be dumped */
+	private $ignoredTables = array();
 
 
 
@@ -29,6 +33,28 @@ class MySQLDump
 		if ($this->connection->connect_errno) {
 			throw new Exception($this->connection->connect_error);
 		}
+	}
+
+
+
+	/**
+	 * @return string[]
+	 */
+	public function getIgnoredTables()
+	{
+		return $this->ignoredTables;
+	}
+
+
+
+	/**
+	 * @param  string[]
+	 * @return self
+	 */
+	public function setIgnoredTables(array $ignoredTables)
+	{
+		$this->ignoredTables = $ignoredTables;
+		return $this;
 	}
 
 
@@ -86,7 +112,9 @@ class MySQLDump
 
 		$res = $this->connection->query('SHOW TABLES');
 		while ($row = $res->fetch_row()) {
-			$tables[] = $row[0];
+			if (!in_array($row[0], $this->ignoredTables)) {
+				$tables[] = $row[0];
+			}
 		}
 		$res->close();
 
