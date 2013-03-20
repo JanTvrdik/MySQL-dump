@@ -20,6 +20,9 @@ class MySQLDump
 	/** @var string[] list of tables which will not be dumped */
 	private $ignoredTables = array();
 
+	/** @var bool lock all tables before dumping */
+	private $useLock = FALSE;
+
 
 
 	/**
@@ -54,6 +57,28 @@ class MySQLDump
 	public function setIgnoredTables(array $ignoredTables)
 	{
 		$this->ignoredTables = $ignoredTables;
+		return $this;
+	}
+
+
+
+	/**
+	 * @return bool
+	 */
+	public function getUseLock()
+	{
+		return $this->useLock;
+	}
+
+
+
+	/**
+	 * @param  bool
+	 * @return self
+	 */
+	public function setUseLock($useLock)
+	{
+		$this->useLock = $useLock;
 		return $this;
 	}
 
@@ -117,6 +142,10 @@ class MySQLDump
 			}
 		}
 		$res->close();
+
+		if ($this->useLock) {
+			$this->connection->query('LOCK TABLES `' . implode('` READ, `', $tables) . '` READ');
+		}
 
 		$db = $this->connection->query('SELECT DATABASE()')->fetch_row();
 		fwrite($handle, "-- David Grudl MySQL Dump Utility\n"
@@ -203,6 +232,10 @@ class MySQLDump
 
 		fwrite($handle, "-- THE END\n");
 		fclose($handle);
+
+		if ($this->useLock) {
+			$this->connection->query('UNLOCK TABLES');
+		}
 	}
 
 }
